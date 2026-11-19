@@ -34,9 +34,13 @@ git clone https://github.com/olbauday/FPL-Core-Insights data/external/FPL-Core-I
 # 3. features and models
 .venv/bin/python -m src.features         # -> data/features.csv
 .venv/bin/python -m src.cv               # walk-forward validation, Elo tuning, LR + XGBoost
+.venv/bin/python -m src.cv_dc            # Dixon-Coles xi tuning + final candidates -> data/dc_probs.csv
 
 # tests
 .venv/bin/python -m pytest tests
 ```
+
+Final model (frozen in `src/config.py`): 50/50 average of the full-feature logistic
+regression and time-weighted Dixon-Coles probabilities.
 
 XGBoost on macOS needs the OpenMP runtime: `brew install libomp`.

@@ -31,6 +31,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from src.config import ELO as _ELO
+
 ROOT = Path(__file__).resolve().parents[1]
 MATCHES_PATH = ROOT / "data" / "matches.csv"
 FEATURES_PATH = ROOT / "data" / "features.csv"
@@ -62,14 +64,12 @@ OUTCOME_COLS = ["home_goals", "away_goals", "result", "ht_home_goals", "ht_away_
 
 @dataclass(frozen=True)
 class EloParams:
-    # Tuned by src/cv.py on pooled walk-forward log loss (2017/18-2022/23) of an Elo-only LR.
-    # home_adv and regress landed at 0; the LR intercept absorbs home advantage, and
-    # between-season regression did not help. Surface is flat: top 8 within 0.0007.
-    k: float = 20.0
-    home_adv: float = 0.0
-    regress: float = 0.0
-    gd_multiplier: bool = True  # World Football Elo goal-difference multiplier on K
-    base: float = 1500.0
+    # Defaults are the frozen values in src/config.py (tuned in src/cv.py).
+    k: float = _ELO["k"]
+    home_adv: float = _ELO["home_adv"]
+    regress: float = _ELO["regress"]  # fraction pulled back toward `base` between seasons
+    gd_multiplier: bool = _ELO["gd_multiplier"]  # World Football Elo goal-difference multiplier
+    base: float = _ELO["base"]
 
 
 def _gd_mult(gd: int) -> float:

@@ -116,3 +116,47 @@ def test_elo_promoted_team_seeded_from_relegated():
     col = "elo_home" if df.loc[first_f, "home_team"] == "F" else "elo_away"
     assert elo.loc[first_f, col] == pytest.approx(seed)
     assert elo.loc[df.season == "2000/01"].iloc[0]["elo_home"] == 1500
+
+
+# --------------------------------------------------------------------------- Dixon-Coles
+
+DC_PATH = MATCHES_PATH.parent / "dc_probs.csv"
+DC_COLS = ["dc_p_home", "dc_p_draw", "dc_p_away"]
+
+
+@pytest.fixture(scope="module")
+def dc_probs() -> pd.DataFrame:
+    if not DC_PATH.exists():
+        pytest.skip("data/dc_probs.csv missing: run `python -m src.cv_dc`")
+    return pd.read_csv(DC_PATH, parse_dates=["date"])
+
+
+def test_dc_cache_uses_frozen_xi(dc_probs):
+    from src.config import DC_XI
+    assert (dc_probs["xi"] == DC_XI).all()
+
+
+def test_dc_probs_use_only_prior_matches(matches, dc_probs):
+    """Scramble every outcome on or after the target date, refit DC cold (no warm start),
+    and compare with the stored warm-started pre-match probabilities.
+    Future fixture lists stay (the season's teams are known before it starts); only
+    future results are scrambled."""
+    from src.config import DC_XI
+    from src.dixon_coles import dc_predict_one
+
+    cv = matches[matches["season"].between("2001/02", "2022/23")]
+    targets = _sample(cv, 5, seed=1)
+    # also a promoted team's first match of a season (uses the relegated-teams prior)
+    promoted = build_features(matches).query("promoted_home == 1 and season > '2001/02'")
+    targets = pd.concat([targets, cv.merge(promoted[KEYS].head(1), on=KEYS)])
+
+    for _, t in targets.iterrows():
+        scrambled = matches.copy()
+        future = scrambled["date"] >= t["date"]
+        scrambled.loc[future, ["home_goals", "away_goals"]] = [9, 0]
+        scrambled.loc[future, "result"] = "H"
+        got = dc_predict_one(scrambled, t["date"], t["home_team"], t["away_team"], DC_XI)[:3]
+        want = dc_probs.merge(t[KEYS].to_frame().T.astype({"date": "datetime64[ns]"}),
+                              on=KEYS)[DC_COLS].iloc[0].to_numpy()
+        np.testing.assert_allclose(got, want, atol=1e-5,
+                                   err_msg=f"{t['date'].date()} {t['home_team']} v {t['away_team']}")
