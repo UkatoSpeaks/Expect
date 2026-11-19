@@ -4,5 +4,6 @@ __pycache__/
 .ipynb_checkpoints/
 .pytest_cache/
 .DS_Store
-data/raw/
+# data/raw/ is tracked: the scheduled pipeline rebuilds data/matches.csv from it in CI.
 data/external/
+*.tmp

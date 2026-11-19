@@ -214,8 +214,10 @@ def add_quality_flags(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def build_matches(raw_dir: Path = RAW_DIR) -> pd.DataFrame:
-    files = sorted(raw_dir.glob("E0_*.csv"))
+def build_matches(raw_dir: Path = RAW_DIR, files: list[Path] | None = None) -> pd.DataFrame:
+    """All season files in raw_dir, or exactly `files` if given (used by src.pipeline to
+    build from a freshly downloaded file before it replaces the one in data/raw)."""
+    files = sorted(raw_dir.glob("E0_*.csv")) if files is None else list(files)
     if not files:
         raise FileNotFoundError(f"No E0_*.csv files in {raw_dir}")
     df = pd.concat([load_season(p) for p in files], ignore_index=True)

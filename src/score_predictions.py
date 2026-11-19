@@ -8,7 +8,9 @@ closing probabilities, and appended to predictions/track_record.csv.
 
 The track record is append-only: a match already in it is never rescored or rewritten.
 Matches are joined on season + home team + away team (each pairing happens once a season),
-so a rescheduled fixture is still matched; its played date is recorded.
+so a rescheduled fixture is still matched; its played date is recorded. A postponed match
+predicted again in predictions/<season>/gwN_rescheduled_<date>.csv is scored on that latest
+prediction (the original gameweek file is left as it was).
 Refresh data/raw/E0_<season>.csv and rerun src.load_data first, so results and closing
 odds are current.
 """
@@ -16,6 +18,7 @@ odds are current.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -35,27 +38,45 @@ COLUMNS = (["season", "gameweek", "match_id", "kickoff_utc", "date_played", "hom
               "prediction_file", "scored_at"])
 
 
-def load_saved_predictions() -> pd.DataFrame:
-    files = sorted(PRED_DIR.glob("*/gw*.csv"))
+def load_saved_predictions(pred_dir: Path = PRED_DIR) -> pd.DataFrame:
+    files = sorted(pred_dir.glob("*/gw*.csv"))
     if not files:
         return pd.DataFrame()
-    return pd.concat([pd.read_csv(f).assign(prediction_file=str(f.relative_to(PRED_DIR)))
+    return pd.concat([pd.read_csv(f).assign(prediction_file=str(f.relative_to(pred_dir)))
                       for f in files], ignore_index=True)
 
 
-def load_track() -> pd.DataFrame:
-    if not TRACK.exists():
+def load_track(path: Path = TRACK) -> pd.DataFrame:
+    if not path.exists():
         return pd.DataFrame(columns=COLUMNS)
-    t = pd.read_csv(TRACK)
+    t = pd.read_csv(path)
     if list(t.columns) != COLUMNS:
-        raise ValueError(f"{TRACK} has unexpected columns; refusing to append")
+        raise ValueError(f"{path} has unexpected columns; refusing to append")
     return t
 
 
-def score_new(preds: pd.DataFrame, matches: pd.DataFrame, track: pd.DataFrame) -> pd.DataFrame:
-    dup = preds.duplicated(JOIN, keep=False)
+def is_rescheduled(prediction_file: pd.Series) -> pd.Series:
+    return prediction_file.str.contains("_rescheduled_", regex=False)
+
+
+def latest_predictions(preds: pd.DataFrame) -> pd.DataFrame:
+    """One row per match. A postponed match can be predicted again on its own
+    (gwN_rescheduled_<date>.csv); the latest rescheduled prediction supersedes the gameweek
+    file's row. The same match in two gameweek files is an error."""
+    if preds.empty:
+        return preds
+    resched = is_rescheduled(preds["prediction_file"])
+    dup = preds[~resched].duplicated(JOIN, keep=False)
     if dup.any():
-        raise ValueError(f"match predicted in more than one file:\n{preds.loc[dup, JOIN + ['prediction_file']]}")
+        raise ValueError(f"match predicted in more than one gameweek file:\n"
+                         f"{preds[~resched].loc[dup, JOIN + ['prediction_file']]}")
+    order = preds.assign(_r=resched, _t=pd.to_datetime(preds["generated_at"], utc=True))
+    order = order.sort_values(["_r", "_t", "prediction_file"], kind="stable")
+    return order.drop_duplicates(JOIN, keep="last").drop(columns=["_r", "_t"]).sort_index()
+
+
+def score_new(preds: pd.DataFrame, matches: pd.DataFrame, track: pd.DataFrame) -> pd.DataFrame:
+    preds = latest_predictions(preds)
     played = matches[matches["result"].notna()].rename(columns={"date": "date_played"})
     new = preds.merge(played[JOIN + ["date_played", "home_goals", "away_goals", "result",
                                      "p_home_implied", "p_draw_implied", "p_away_implied"]],
@@ -110,7 +131,7 @@ def main() -> None:
     matches = pd.read_csv(MATCHES_PATH, parse_dates=["date"])
     track = load_track()
     new = score_new(preds, matches, track)
-    pending = len(preds) - len(track) - len(new)
+    pending = len(latest_predictions(preds)) - len(track) - len(new)
     if len(new):
         new.to_csv(TRACK, mode="a", header=not TRACK.exists(), index=False, float_format="%.6f")
         print(f"appended {len(new)} matches to {TRACK}")

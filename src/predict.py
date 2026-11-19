@@ -37,13 +37,28 @@ PRED_DIR = ROOT / "predictions"
 KEYS = ["date", "home_team", "away_team"]
 
 
-def season_dir(season: str) -> Path:
+PRED_COLS = ["season", "gameweek", "match_id", "kickoff_utc", "date", "home_team", "away_team",
+             "p_home", "p_draw", "p_away", "lr_p_home", "lr_p_draw", "lr_p_away",
+             "dc_p_home", "dc_p_draw", "dc_p_away", "dc_exp_home", "dc_exp_away",
+             "elo_home", "elo_away", "elo_diff", "dc_n_matches", "lr_n_train",
+             "data_through", "generated_at"]
+
+
+def season_dir(season: str, pred_dir: Path = PRED_DIR) -> Path:
     a, b = season.split("/")
-    return PRED_DIR / f"{a}-{b}"
+    return pred_dir / f"{a}-{b}"
 
 
-def gw_path(season: str, gameweek: int) -> Path:
-    return season_dir(season) / f"gw{gameweek}.csv"
+def gw_path(season: str, gameweek: int, pred_dir: Path = PRED_DIR) -> Path:
+    return season_dir(season, pred_dir) / f"gw{gameweek}.csv"
+
+
+def rescheduled_path(season: str, gameweek: int, date: pd.Timestamp, pred_dir: Path = PRED_DIR,
+                     n: int = 1) -> Path:
+    """predictions/<season>/gw<N>_rescheduled_<date>.csv for postponed fixtures predicted on
+    their own (n > 1 only if that name is already taken by another fixture)."""
+    suffix = "" if n == 1 else f"_{n}"
+    return season_dir(season, pred_dir) / f"gw{gameweek}_rescheduled_{date:%Y-%m-%d}{suffix}.csv"
 
 
 def load_fixtures(fpl: pd.DataFrame, season: str, gameweek: int | None) -> tuple[int, pd.DataFrame]:
@@ -120,6 +135,17 @@ def build_predictions(matches: pd.DataFrame, fixtures: pd.DataFrame, season: str
     return out
 
 
+def prediction_file(matches: pd.DataFrame, fixtures: pd.DataFrame, season: str,
+                    gameweek: int, now: pd.Timestamp) -> pd.DataFrame:
+    """The rows written to predictions/<season>/gw<N>.csv (columns PRED_COLS)."""
+    pred = build_predictions(matches, fixtures, season)
+    meta = fixtures[["home_team", "away_team", "match_id", "kickoff_utc"]]
+    pred = pred.merge(meta, on=["home_team", "away_team"], validate="1:1")
+    pred.insert(1, "gameweek", gameweek)
+    pred["generated_at"] = now.isoformat(timespec="seconds")
+    return pred[PRED_COLS]
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--gameweek", type=int, help="default: next gameweek with no finished matches")
@@ -141,17 +167,7 @@ def main() -> None:
     matches = pd.read_csv(MATCHES_PATH, parse_dates=["date"])
     check_data_current(matches, fpl, season)
 
-    pred = build_predictions(matches, fixtures, season)
-    meta = fixtures[["home_team", "away_team", "match_id", "kickoff_utc"]]
-    pred = pred.merge(meta, on=["home_team", "away_team"], validate="1:1")
-    pred.insert(1, "gameweek", gameweek)
-    pred["generated_at"] = now.isoformat(timespec="seconds")
-    cols = (["season", "gameweek", "match_id", "kickoff_utc", "date", "home_team", "away_team",
-             "p_home", "p_draw", "p_away", "lr_p_home", "lr_p_draw", "lr_p_away",
-             "dc_p_home", "dc_p_draw", "dc_p_away", "dc_exp_home", "dc_exp_away",
-             "elo_home", "elo_away", "elo_diff", "dc_n_matches", "lr_n_train",
-             "data_through", "generated_at"])
-    pred = pred[cols]
+    pred = prediction_file(matches, fixtures, season, gameweek, now)
 
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "x", newline="") as f:  # "x": fail if the file appeared meanwhile

@@ -1,0 +1,1504 @@
+{
+  "name": "Xpect",
+  "description": "Pre-match home/draw/away probabilities for Premier League matches, built only from information available before kick-off. Bookmaker odds are a benchmark, never a model input.",
+  "model": {
+    "blend": "0.5 x logistic regression + 0.5 x Dixon-Coles",
+    "logistic_regression": {
+      "features": "Elo ratings, rolling form (last 5/10 matches: points, goals, shots, shots on target, corners), venue form, head-to-head, rest days, promoted-team and no-crowd flags",
+      "C": 0.003,
+      "trained_from": "2001/02"
+    },
+    "dixon_coles": {
+      "time_decay_xi_per_day": 0.002,
+      "window_days": 1825,
+      "ridge": 2.0
+    },
+    "elo": {
+      "k": 20.0,
+      "home_adv": 0.0,
+      "regress": 0.0,
+      "gd_multiplier": true,
+      "base": 1500.0
+    },
+    "frozen": "src/config.py; unchanged after looking at test or forward results",
+    "market_benchmark": "closing 1X2 odds from football-data.co.uk, margin removed proportionally"
+  },
+  "data_sources": [
+    {
+      "name": "football-data.co.uk",
+      "url": "https://www.football-data.co.uk/englandm.php"
+    },
+    {
+      "name": "FPL-Core-Insights",
+      "url": "https://github.com/olbauday/FPL-Core-Insights"
+    }
+  ],
+  "evaluation": {
+    "protocol": "walk-forward: each season predicted by a model trained on all earlier seasons; differences are model minus market (or minus LR) with 95% paired bootstrap CIs; negative = model better",
+    "cv": {
+      "seasons": [
+        "2017/18",
+        "2018/19",
+        "2019/20",
+        "2020/21",
+        "2021/22",
+        "2022/23"
+      ],
+      "source": "reports/cv_dc_pooled.csv",
+      "rows": [
+        {
+          "model": "Market",
+          "log_loss": 0.9499,
+          "brier": 0.5616,
+          "accuracy": 0.5535,
+          "log_loss_vs_LR": {
+            "diff": -0.0206,
+            "ci_95": [
+              -0.0278,
+              -0.0131
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0134,
+            "ci_95": [
+              -0.0181,
+              -0.0085
+            ]
+          },
+          "log_loss_vs_market": null,
+          "brier_vs_market": null
+        },
+        {
+          "model": "Full LR (C=0.003)",
+          "log_loss": 0.9704,
+          "brier": 0.575,
+          "accuracy": 0.543,
+          "log_loss_vs_LR": null,
+          "brier_vs_LR": null,
+          "log_loss_vs_market": {
+            "diff": 0.0206,
+            "ci_95": [
+              0.0131,
+              0.0278
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0134,
+            "ci_95": [
+              0.0085,
+              0.0181
+            ]
+          }
+        },
+        {
+          "model": "a) Dixon-Coles",
+          "log_loss": 0.9659,
+          "brier": 0.5724,
+          "accuracy": 0.5404,
+          "log_loss_vs_LR": {
+            "diff": -0.0046,
+            "ci_95": [
+              -0.0122,
+              0.003
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0026,
+            "ci_95": [
+              -0.0077,
+              0.0023
+            ]
+          },
+          "log_loss_vs_market": {
+            "diff": 0.016,
+            "ci_95": [
+              0.0088,
+              0.0231
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0107,
+            "ci_95": [
+              0.0059,
+              0.0155
+            ]
+          }
+        },
+        {
+          "model": "b) LR + DC features (C=0.001)",
+          "log_loss": 0.9668,
+          "brier": 0.5728,
+          "accuracy": 0.5408,
+          "log_loss_vs_LR": {
+            "diff": -0.0036,
+            "ci_95": [
+              -0.0056,
+              -0.0016
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0022,
+            "ci_95": [
+              -0.0035,
+              -0.0009
+            ]
+          },
+          "log_loss_vs_market": {
+            "diff": 0.017,
+            "ci_95": [
+              0.0101,
+              0.0235
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0112,
+            "ci_95": [
+              0.0067,
+              0.0154
+            ]
+          }
+        },
+        {
+          "model": "c) Average(LR, DC)",
+          "log_loss": 0.9637,
+          "brier": 0.5708,
+          "accuracy": 0.5478,
+          "log_loss_vs_LR": {
+            "diff": -0.0067,
+            "ci_95": [
+              -0.0106,
+              -0.0029
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0042,
+            "ci_95": [
+              -0.0068,
+              -0.0017
+            ]
+          },
+          "log_loss_vs_market": {
+            "diff": 0.0138,
+            "ci_95": [
+              0.0076,
+              0.0199
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0092,
+            "ci_95": [
+              0.0051,
+              0.0132
+            ]
+          }
+        }
+      ]
+    },
+    "test": {
+      "seasons": [
+        "2023/24",
+        "2024/25"
+      ],
+      "source": "reports/test/scores.csv",
+      "rows": [
+        {
+          "scope": "2023/24",
+          "model": "Blend (LR + DC)",
+          "n": 380,
+          "log_loss": 0.9192,
+          "brier": 0.5404,
+          "accuracy": 0.5921,
+          "log_loss_vs_market": {
+            "diff": 0.0185,
+            "ci_95": [
+              0.0046,
+              0.0318
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0136,
+            "ci_95": [
+              0.0043,
+              0.0226
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0079,
+            "ci_95": [
+              -0.0342,
+              0.0184
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": 0.0003,
+            "ci_95": [
+              -0.0089,
+              0.0089
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": 0.0001,
+            "ci_95": [
+              -0.0057,
+              0.0058
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.0026,
+            "ci_95": [
+              -0.0132,
+              0.0184
+            ]
+          }
+        },
+        {
+          "scope": "2023/24",
+          "model": "LR (C=0.003)",
+          "n": 380,
+          "log_loss": 0.9189,
+          "brier": 0.5403,
+          "accuracy": 0.5895,
+          "log_loss_vs_market": {
+            "diff": 0.0182,
+            "ci_95": [
+              0.0023,
+              0.0344
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0135,
+            "ci_95": [
+              0.0029,
+              0.0242
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0105,
+            "ci_95": [
+              -0.0342,
+              0.0132
+            ]
+          },
+          "log_loss_vs_LR": null,
+          "brier_vs_LR": null,
+          "accuracy_vs_LR": null
+        },
+        {
+          "scope": "2023/24",
+          "model": "Dixon-Coles",
+          "n": 380,
+          "log_loss": 0.9266,
+          "brier": 0.5454,
+          "accuracy": 0.5868,
+          "log_loss_vs_market": {
+            "diff": 0.0259,
+            "ci_95": [
+              0.0095,
+              0.0416
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0187,
+            "ci_95": [
+              0.0076,
+              0.0292
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0132,
+            "ci_95": [
+              -0.0447,
+              0.0184
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": 0.0076,
+            "ci_95": [
+              -0.0096,
+              0.0243
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": 0.0051,
+            "ci_95": [
+              -0.0062,
+              0.0164
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": -0.0026,
+            "ci_95": [
+              -0.0316,
+              0.0263
+            ]
+          }
+        },
+        {
+          "scope": "2023/24",
+          "model": "Home-rate baseline",
+          "n": 380,
+          "log_loss": 1.0568,
+          "brier": 0.6385,
+          "accuracy": 0.4605,
+          "log_loss_vs_market": {
+            "diff": 0.1561,
+            "ci_95": [
+              0.1116,
+              0.1997
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.1118,
+            "ci_95": [
+              0.0809,
+              0.1427
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.1395,
+            "ci_95": [
+              -0.1921,
+              -0.0842
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": 0.1378,
+            "ci_95": [
+              0.0949,
+              0.1789
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": 0.0982,
+            "ci_95": [
+              0.0685,
+              0.127
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": -0.1289,
+            "ci_95": [
+              -0.1789,
+              -0.0789
+            ]
+          }
+        },
+        {
+          "scope": "2023/24",
+          "model": "Market",
+          "n": 380,
+          "log_loss": 0.9007,
+          "brier": 0.5267,
+          "accuracy": 0.6,
+          "log_loss_vs_market": null,
+          "brier_vs_market": null,
+          "accuracy_vs_market": null,
+          "log_loss_vs_LR": {
+            "diff": -0.0182,
+            "ci_95": [
+              -0.0344,
+              -0.0023
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0135,
+            "ci_95": [
+              -0.0242,
+              -0.0029
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.0105,
+            "ci_95": [
+              -0.0132,
+              0.0342
+            ]
+          }
+        },
+        {
+          "scope": "2024/25",
+          "model": "Blend (LR + DC)",
+          "n": 380,
+          "log_loss": 0.9823,
+          "brier": 0.5871,
+          "accuracy": 0.5184,
+          "log_loss_vs_market": {
+            "diff": 0.0155,
+            "ci_95": [
+              0.0011,
+              0.03
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0119,
+            "ci_95": [
+              0.0021,
+              0.0218
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0368,
+            "ci_95": [
+              -0.0658,
+              -0.0079
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": -0.0057,
+            "ci_95": [
+              -0.0149,
+              0.0031
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0045,
+            "ci_95": [
+              -0.0104,
+              0.0011
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": -0.0079,
+            "ci_95": [
+              -0.0289,
+              0.0132
+            ]
+          }
+        },
+        {
+          "scope": "2024/25",
+          "model": "LR (C=0.003)",
+          "n": 380,
+          "log_loss": 0.988,
+          "brier": 0.5916,
+          "accuracy": 0.5263,
+          "log_loss_vs_market": {
+            "diff": 0.0213,
+            "ci_95": [
+              0.0041,
+              0.0381
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0164,
+            "ci_95": [
+              0.0051,
+              0.0277
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0289,
+            "ci_95": [
+              -0.0526,
+              -0.0053
+            ]
+          },
+          "log_loss_vs_LR": null,
+          "brier_vs_LR": null,
+          "accuracy_vs_LR": null
+        },
+        {
+          "scope": "2024/25",
+          "model": "Dixon-Coles",
+          "n": 380,
+          "log_loss": 0.9842,
+          "brier": 0.5879,
+          "accuracy": 0.5316,
+          "log_loss_vs_market": {
+            "diff": 0.0174,
+            "ci_95": [
+              0.0008,
+              0.0347
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0128,
+            "ci_95": [
+              0.0012,
+              0.0247
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0237,
+            "ci_95": [
+              -0.0553,
+              0.0079
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": -0.0038,
+            "ci_95": [
+              -0.0213,
+              0.0134
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0037,
+            "ci_95": [
+              -0.0154,
+              0.0076
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.0053,
+            "ci_95": [
+              -0.0237,
+              0.0316
+            ]
+          }
+        },
+        {
+          "scope": "2024/25",
+          "model": "Home-rate baseline",
+          "n": 380,
+          "log_loss": 1.085,
+          "brier": 0.6584,
+          "accuracy": 0.4079,
+          "log_loss_vs_market": {
+            "diff": 0.1182,
+            "ci_95": [
+              0.0777,
+              0.1587
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0832,
+            "ci_95": [
+              0.0546,
+              0.1124
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.1474,
+            "ci_95": [
+              -0.1974,
+              -0.1
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": 0.097,
+            "ci_95": [
+              0.0537,
+              0.1406
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": 0.0668,
+            "ci_95": [
+              0.0368,
+              0.0972
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": -0.1184,
+            "ci_95": [
+              -0.1684,
+              -0.0684
+            ]
+          }
+        },
+        {
+          "scope": "2024/25",
+          "model": "Market",
+          "n": 380,
+          "log_loss": 0.9667,
+          "brier": 0.5752,
+          "accuracy": 0.5553,
+          "log_loss_vs_market": null,
+          "brier_vs_market": null,
+          "accuracy_vs_market": null,
+          "log_loss_vs_LR": {
+            "diff": -0.0213,
+            "ci_95": [
+              -0.0381,
+              -0.0041
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0164,
+            "ci_95": [
+              -0.0277,
+              -0.0051
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.0289,
+            "ci_95": [
+              0.0053,
+              0.0526
+            ]
+          }
+        },
+        {
+          "scope": "pooled",
+          "model": "Blend (LR + DC)",
+          "n": 760,
+          "log_loss": 0.9508,
+          "brier": 0.5637,
+          "accuracy": 0.5553,
+          "log_loss_vs_market": {
+            "diff": 0.017,
+            "ci_95": [
+              0.0072,
+              0.0271
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0128,
+            "ci_95": [
+              0.006,
+              0.0196
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0224,
+            "ci_95": [
+              -0.0421,
+              -0.0039
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": -0.0027,
+            "ci_95": [
+              -0.009,
+              0.0035
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0022,
+            "ci_95": [
+              -0.0063,
+              0.0019
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": -0.0026,
+            "ci_95": [
+              -0.0158,
+              0.0118
+            ]
+          }
+        },
+        {
+          "scope": "pooled",
+          "model": "LR (C=0.003)",
+          "n": 760,
+          "log_loss": 0.9535,
+          "brier": 0.5659,
+          "accuracy": 0.5579,
+          "log_loss_vs_market": {
+            "diff": 0.0198,
+            "ci_95": [
+              0.0076,
+              0.0315
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.015,
+            "ci_95": [
+              0.007,
+              0.023
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0197,
+            "ci_95": [
+              -0.0368,
+              -0.0026
+            ]
+          },
+          "log_loss_vs_LR": null,
+          "brier_vs_LR": null,
+          "accuracy_vs_LR": null
+        },
+        {
+          "scope": "pooled",
+          "model": "Dixon-Coles",
+          "n": 760,
+          "log_loss": 0.9554,
+          "brier": 0.5667,
+          "accuracy": 0.5592,
+          "log_loss_vs_market": {
+            "diff": 0.0217,
+            "ci_95": [
+              0.0104,
+              0.0336
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0157,
+            "ci_95": [
+              0.0078,
+              0.024
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0184,
+            "ci_95": [
+              -0.0408,
+              0.0026
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": 0.0019,
+            "ci_95": [
+              -0.0103,
+              0.0139
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": 0.0007,
+            "ci_95": [
+              -0.0075,
+              0.0089
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.0013,
+            "ci_95": [
+              -0.0184,
+              0.0211
+            ]
+          }
+        },
+        {
+          "scope": "pooled",
+          "model": "Home-rate baseline",
+          "n": 760,
+          "log_loss": 1.0709,
+          "brier": 0.6485,
+          "accuracy": 0.4342,
+          "log_loss_vs_market": {
+            "diff": 0.1371,
+            "ci_95": [
+              0.1065,
+              0.1661
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0975,
+            "ci_95": [
+              0.0759,
+              0.1182
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.1434,
+            "ci_95": [
+              -0.1803,
+              -0.1066
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": 0.1174,
+            "ci_95": [
+              0.0861,
+              0.1466
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": 0.0825,
+            "ci_95": [
+              0.0608,
+              0.1031
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": -0.1237,
+            "ci_95": [
+              -0.1605,
+              -0.0881
+            ]
+          }
+        },
+        {
+          "scope": "pooled",
+          "model": "Market",
+          "n": 760,
+          "log_loss": 0.9337,
+          "brier": 0.551,
+          "accuracy": 0.5776,
+          "log_loss_vs_market": null,
+          "brier_vs_market": null,
+          "accuracy_vs_market": null,
+          "log_loss_vs_LR": {
+            "diff": -0.0198,
+            "ci_95": [
+              -0.0315,
+              -0.0076
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.015,
+            "ci_95": [
+              -0.023,
+              -0.007
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.0197,
+            "ci_95": [
+              0.0026,
+              0.0368
+            ]
+          }
+        }
+      ]
+    },
+    "forward": {
+      "seasons": [
+        "2025/26",
+        "2026/27"
+      ],
+      "through": "2026-11-08",
+      "source": "reports/forward_2026-11-08/scores.csv",
+      "rows": [
+        {
+          "scope": "2025/26",
+          "model": "Blend (LR + DC)",
+          "n": 380,
+          "log_loss": 1.0292,
+          "brier": 0.6191,
+          "accuracy": 0.4737,
+          "log_loss_vs_market": {
+            "diff": 0.0174,
+            "ci_95": [
+              0.0035,
+              0.031
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0114,
+            "ci_95": [
+              0.0017,
+              0.0208
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0211,
+            "ci_95": [
+              -0.0474,
+              0.0053
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": -0.0092,
+            "ci_95": [
+              -0.0199,
+              0.0008
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0061,
+            "ci_95": [
+              -0.0126,
+              0.0002
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": -0.0105,
+            "ci_95": [
+              -0.0289,
+              0.0079
+            ]
+          }
+        },
+        {
+          "scope": "2025/26",
+          "model": "LR (C=0.003)",
+          "n": 380,
+          "log_loss": 1.0383,
+          "brier": 0.6252,
+          "accuracy": 0.4842,
+          "log_loss_vs_market": {
+            "diff": 0.0266,
+            "ci_95": [
+              0.008,
+              0.0446
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0175,
+            "ci_95": [
+              0.0054,
+              0.0293
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0105,
+            "ci_95": [
+              -0.0368,
+              0.0158
+            ]
+          },
+          "log_loss_vs_LR": null,
+          "brier_vs_LR": null,
+          "accuracy_vs_LR": null
+        },
+        {
+          "scope": "2025/26",
+          "model": "Dixon-Coles",
+          "n": 380,
+          "log_loss": 1.0291,
+          "brier": 0.6184,
+          "accuracy": 0.4711,
+          "log_loss_vs_market": {
+            "diff": 0.0174,
+            "ci_95": [
+              0.0016,
+              0.0333
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0106,
+            "ci_95": [
+              -0.0004,
+              0.0216
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0237,
+            "ci_95": [
+              -0.05,
+              0.0026
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": -0.0092,
+            "ci_95": [
+              -0.029,
+              0.0099
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0069,
+            "ci_95": [
+              -0.0196,
+              0.0059
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": -0.0132,
+            "ci_95": [
+              -0.0422,
+              0.0158
+            ]
+          }
+        },
+        {
+          "scope": "2025/26",
+          "model": "Home-rate baseline",
+          "n": 380,
+          "log_loss": 1.0818,
+          "brier": 0.655,
+          "accuracy": 0.4263,
+          "log_loss_vs_market": {
+            "diff": 0.0701,
+            "ci_95": [
+              0.0341,
+              0.1044
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0473,
+            "ci_95": [
+              0.0219,
+              0.0722
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0684,
+            "ci_95": [
+              -0.1184,
+              -0.0184
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": 0.0435,
+            "ci_95": [
+              0.0052,
+              0.0813
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": 0.0298,
+            "ci_95": [
+              0.0031,
+              0.0561
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": -0.0579,
+            "ci_95": [
+              -0.1053,
+              -0.0105
+            ]
+          }
+        },
+        {
+          "scope": "2025/26",
+          "model": "Market",
+          "n": 380,
+          "log_loss": 1.0118,
+          "brier": 0.6077,
+          "accuracy": 0.4947,
+          "log_loss_vs_market": null,
+          "brier_vs_market": null,
+          "accuracy_vs_market": null,
+          "log_loss_vs_LR": {
+            "diff": -0.0266,
+            "ci_95": [
+              -0.0446,
+              -0.008
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0175,
+            "ci_95": [
+              -0.0293,
+              -0.0054
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.0105,
+            "ci_95": [
+              -0.0158,
+              0.0368
+            ]
+          }
+        },
+        {
+          "scope": "2026/27",
+          "model": "Blend (LR + DC)",
+          "n": 100,
+          "log_loss": 1.0177,
+          "brier": 0.6081,
+          "accuracy": 0.48,
+          "log_loss_vs_market": {
+            "diff": 0.0069,
+            "ci_95": [
+              -0.0289,
+              0.0415
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0034,
+            "ci_95": [
+              -0.0214,
+              0.0271
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": 0.0,
+            "ci_95": [
+              -0.05,
+              0.05
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": -0.0043,
+            "ci_95": [
+              -0.024,
+              0.0157
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0054,
+            "ci_95": [
+              -0.0191,
+              0.0082
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.08,
+            "ci_95": [
+              0.03,
+              0.14
+            ]
+          }
+        },
+        {
+          "scope": "2026/27",
+          "model": "LR (C=0.003)",
+          "n": 100,
+          "log_loss": 1.022,
+          "brier": 0.6135,
+          "accuracy": 0.4,
+          "log_loss_vs_market": {
+            "diff": 0.0112,
+            "ci_95": [
+              -0.024,
+              0.0455
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0088,
+            "ci_95": [
+              -0.0157,
+              0.0328
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.08,
+            "ci_95": [
+              -0.14,
+              -0.03
+            ]
+          },
+          "log_loss_vs_LR": null,
+          "brier_vs_LR": null,
+          "accuracy_vs_LR": null
+        },
+        {
+          "scope": "2026/27",
+          "model": "Dixon-Coles",
+          "n": 100,
+          "log_loss": 1.0238,
+          "brier": 0.6091,
+          "accuracy": 0.53,
+          "log_loss_vs_market": {
+            "diff": 0.013,
+            "ci_95": [
+              -0.0323,
+              0.0584
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0044,
+            "ci_95": [
+              -0.0265,
+              0.0334
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": 0.05,
+            "ci_95": [
+              0.0,
+              0.1
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": 0.0017,
+            "ci_95": [
+              -0.0376,
+              0.0438
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0044,
+            "ci_95": [
+              -0.0313,
+              0.0229
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.13,
+            "ci_95": [
+              0.06,
+              0.2
+            ]
+          }
+        },
+        {
+          "scope": "2026/27",
+          "model": "Home-rate baseline",
+          "n": 100,
+          "log_loss": 1.0836,
+          "brier": 0.6565,
+          "accuracy": 0.42,
+          "log_loss_vs_market": {
+            "diff": 0.0729,
+            "ci_95": [
+              0.0002,
+              0.1401
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0518,
+            "ci_95": [
+              -0.0001,
+              0.0996
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.06,
+            "ci_95": [
+              -0.17,
+              0.04
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": 0.0616,
+            "ci_95": [
+              -0.0031,
+              0.1248
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": 0.043,
+            "ci_95": [
+              -0.0036,
+              0.0884
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.02,
+            "ci_95": [
+              -0.08,
+              0.12
+            ]
+          }
+        },
+        {
+          "scope": "2026/27",
+          "model": "Market",
+          "n": 100,
+          "log_loss": 1.0108,
+          "brier": 0.6047,
+          "accuracy": 0.48,
+          "log_loss_vs_market": null,
+          "brier_vs_market": null,
+          "accuracy_vs_market": null,
+          "log_loss_vs_LR": {
+            "diff": -0.0112,
+            "ci_95": [
+              -0.0455,
+              0.024
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0088,
+            "ci_95": [
+              -0.0328,
+              0.0157
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.08,
+            "ci_95": [
+              0.03,
+              0.14
+            ]
+          }
+        },
+        {
+          "scope": "pooled",
+          "model": "Blend (LR + DC)",
+          "n": 480,
+          "log_loss": 1.0268,
+          "brier": 0.6168,
+          "accuracy": 0.475,
+          "log_loss_vs_market": {
+            "diff": 0.0152,
+            "ci_95": [
+              0.0021,
+              0.0278
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0097,
+            "ci_95": [
+              0.0007,
+              0.0187
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0167,
+            "ci_95": [
+              -0.0396,
+              0.0063
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": -0.0082,
+            "ci_95": [
+              -0.0175,
+              0.0009
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.006,
+            "ci_95": [
+              -0.0118,
+              -0.0002
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.0083,
+            "ci_95": [
+              -0.0104,
+              0.0271
+            ]
+          }
+        },
+        {
+          "scope": "pooled",
+          "model": "LR (C=0.003)",
+          "n": 480,
+          "log_loss": 1.0349,
+          "brier": 0.6228,
+          "accuracy": 0.4667,
+          "log_loss_vs_market": {
+            "diff": 0.0234,
+            "ci_95": [
+              0.0074,
+              0.0396
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0157,
+            "ci_95": [
+              0.005,
+              0.0263
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.025,
+            "ci_95": [
+              -0.05,
+              -0.002
+            ]
+          },
+          "log_loss_vs_LR": null,
+          "brier_vs_LR": null,
+          "accuracy_vs_LR": null
+        },
+        {
+          "scope": "pooled",
+          "model": "Dixon-Coles",
+          "n": 480,
+          "log_loss": 1.028,
+          "brier": 0.6164,
+          "accuracy": 0.4833,
+          "log_loss_vs_market": {
+            "diff": 0.0165,
+            "ci_95": [
+              0.0011,
+              0.0318
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0093,
+            "ci_95": [
+              -0.0012,
+              0.0201
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0083,
+            "ci_95": [
+              -0.0333,
+              0.0146
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": -0.0069,
+            "ci_95": [
+              -0.0249,
+              0.0106
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0064,
+            "ci_95": [
+              -0.0178,
+              0.005
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.0167,
+            "ci_95": [
+              -0.0104,
+              0.0437
+            ]
+          }
+        },
+        {
+          "scope": "pooled",
+          "model": "Home-rate baseline",
+          "n": 480,
+          "log_loss": 1.0822,
+          "brier": 0.6554,
+          "accuracy": 0.425,
+          "log_loss_vs_market": {
+            "diff": 0.0706,
+            "ci_95": [
+              0.0385,
+              0.1022
+            ]
+          },
+          "brier_vs_market": {
+            "diff": 0.0482,
+            "ci_95": [
+              0.0253,
+              0.0706
+            ]
+          },
+          "accuracy_vs_market": {
+            "diff": -0.0667,
+            "ci_95": [
+              -0.1104,
+              -0.0208
+            ]
+          },
+          "log_loss_vs_LR": {
+            "diff": 0.0473,
+            "ci_95": [
+              0.0141,
+              0.0808
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": 0.0325,
+            "ci_95": [
+              0.0096,
+              0.0557
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": -0.0417,
+            "ci_95": [
+              -0.0833,
+              0.0021
+            ]
+          }
+        },
+        {
+          "scope": "pooled",
+          "model": "Market",
+          "n": 480,
+          "log_loss": 1.0116,
+          "brier": 0.6071,
+          "accuracy": 0.4917,
+          "log_loss_vs_market": null,
+          "brier_vs_market": null,
+          "accuracy_vs_market": null,
+          "log_loss_vs_LR": {
+            "diff": -0.0234,
+            "ci_95": [
+              -0.0396,
+              -0.0074
+            ]
+          },
+          "brier_vs_LR": {
+            "diff": -0.0157,
+            "ci_95": [
+              -0.0263,
+              -0.005
+            ]
+          },
+          "accuracy_vs_LR": {
+            "diff": 0.025,
+            "ci_95": [
+              0.002,
+              0.05
+            ]
+          }
+        }
+      ]
+    },
+    "live": null
+  },
+  "data_through": "2026-11-08",
+  "last_updated": "2026-11-19T14:49:58Z"
+}
