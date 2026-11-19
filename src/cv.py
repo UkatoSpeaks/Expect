@@ -188,7 +188,11 @@ def summarize(preds: dict[str, pd.DataFrame], y: pd.Series) -> tuple[pd.DataFram
     return per_fold, pd.DataFrame(rows).set_index("model")
 
 
-def calibration_plot(preds: dict[str, pd.DataFrame], y: pd.Series, path: Path) -> None:
+CV_CAL_TITLE = "Calibration, pooled walk-forward 2017/18–2022/23 (2,280 matches, 10 equal-count bins)"
+
+
+def calibration_plot(preds: dict[str, pd.DataFrame], y: pd.Series, path: Path,
+                     title: str = CV_CAL_TITLE) -> None:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -205,13 +209,14 @@ def calibration_plot(preds: dict[str, pd.DataFrame], y: pd.Series, path: Path) -
     })
     Y = onehot(y)
     names = {"H": "Home win", "D": "Draw", "A": "Away win"}
+    n = len(preds)
     fig, axes = plt.subplots(1, 3, figsize=(12, 4.9), sharey=True, layout="constrained")
     for j, (cls, ax) in enumerate(zip(CLASSES, axes)):
         ax.plot([0, 0.8], [0, 0.8], color=INK2, lw=1, ls="--", label="Perfect calibration")
         for (name, p), color in zip(preds.items(), colors):
             prob = p[cls].to_numpy()
             obs = Y[y.index.get_indexer(p.index), j]
-            # equal-count bins so every point rests on ~228 matches
+            # equal-count bins (10% of matches each)
             bins = np.quantile(prob, np.linspace(0, 1, 11))
             idx = np.clip(np.digitize(prob, bins[1:-1]), 0, 9)
             g = pd.DataFrame({"b": idx, "p": prob, "o": obs}).groupby("b").mean()
@@ -220,9 +225,8 @@ def calibration_plot(preds: dict[str, pd.DataFrame], y: pd.Series, path: Path) -
         ax.set_xlim(0, 0.8); ax.set_ylim(0, 0.8); ax.set_aspect("equal")
         ax.set_title(names[cls]); ax.set_xlabel("Predicted probability")
     axes[0].set_ylabel("Observed frequency")
-    fig.legend(*axes[0].get_legend_handles_labels(), loc="outside lower center", ncols=4, frameon=False)
-    fig.suptitle("Calibration, pooled walk-forward 2017/18–2022/23 (2,280 matches, 10 equal-count bins)",
-                 x=0.01, ha="left", fontweight="bold")
+    fig.legend(*axes[0].get_legend_handles_labels(), loc="outside lower center", ncols=n + 1, frameon=False)
+    fig.suptitle(title, x=0.01, ha="left", fontweight="bold")
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, dpi=150)
     plt.close(fig)
