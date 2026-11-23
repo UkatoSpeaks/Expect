@@ -1,6 +1,441 @@
 {
   "counted_rule": "predicted before kick-off and closing market odds available",
-  "totals": null,
-  "by_gameweek": [],
-  "matches": []
+  "totals": {
+    "n": 9,
+    "n_excluded": 0,
+    "model": {
+      "log_loss": 1.1182,
+      "brier": 0.6889,
+      "accuracy": 0.4444
+    },
+    "market": {
+      "log_loss": 1.1949,
+      "brier": 0.7439,
+      "accuracy": 0.4444
+    }
+  },
+  "by_gameweek": [
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "n": 9,
+      "model": {
+        "log_loss": 1.1182,
+        "brier": 0.6889,
+        "accuracy": 0.4444
+      },
+      "market": {
+        "log_loss": 1.1949,
+        "brier": 0.7439,
+        "accuracy": 0.4444
+      }
+    }
+  ],
+  "matches": [
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "match_id": "26-27-prem-manchester-city-vs-fulham",
+      "kickoff_utc": "2026-11-21T12:30:00Z",
+      "date_played": "2026-11-21",
+      "home_team": "Man City",
+      "away_team": "Fulham",
+      "home_goals": 1,
+      "away_goals": 1,
+      "result": "D",
+      "model": {
+        "p_home": 0.6479,
+        "p_draw": 0.2152,
+        "p_away": 0.1369,
+        "log_loss": 1.536,
+        "brier": 1.0543,
+        "correct": false
+      },
+      "market": {
+        "p_home": 0.6943,
+        "p_draw": 0.1781,
+        "p_away": 0.1276,
+        "log_loss": 1.7251,
+        "brier": 1.1737,
+        "correct": false
+      },
+      "prediction_file": "2026-27/gw11.csv",
+      "rescheduled": false,
+      "made_before_kickoff": true,
+      "counted": true,
+      "running": {
+        "n": 1,
+        "model": {
+          "log_loss": 1.536,
+          "brier": 1.0543,
+          "accuracy": 0.0
+        },
+        "market": {
+          "log_loss": 1.7251,
+          "brier": 1.1737,
+          "accuracy": 0.0
+        }
+      }
+    },
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "match_id": "26-27-prem-aston-villa-vs-sunderland",
+      "kickoff_utc": "2026-11-21T15:00:00Z",
+      "date_played": "2026-11-21",
+      "home_team": "Aston Villa",
+      "away_team": "Sunderland",
+      "home_goals": 0,
+      "away_goals": 0,
+      "result": "D",
+      "model": {
+        "p_home": 0.5243,
+        "p_draw": 0.2575,
+        "p_away": 0.2182,
+        "log_loss": 1.3566,
+        "brier": 0.8737,
+        "correct": false
+      },
+      "market": {
+        "p_home": 0.5542,
+        "p_draw": 0.241,
+        "p_away": 0.2048,
+        "log_loss": 1.4231,
+        "brier": 0.9252,
+        "correct": false
+      },
+      "prediction_file": "2026-27/gw11.csv",
+      "rescheduled": false,
+      "made_before_kickoff": true,
+      "counted": true,
+      "running": {
+        "n": 2,
+        "model": {
+          "log_loss": 1.4463,
+          "brier": 0.964,
+          "accuracy": 0.0
+        },
+        "market": {
+          "log_loss": 1.5741,
+          "brier": 1.0495,
+          "accuracy": 0.0
+        }
+      }
+    },
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "match_id": "26-27-prem-afc-bournemouth-vs-nottingham-forest",
+      "kickoff_utc": "2026-11-21T15:00:00Z",
+      "date_played": "2026-11-21",
+      "home_team": "Bournemouth",
+      "away_team": "Nott'm Forest",
+      "home_goals": 2,
+      "away_goals": 0,
+      "result": "H",
+      "model": {
+        "p_home": 0.4842,
+        "p_draw": 0.2648,
+        "p_away": 0.251,
+        "log_loss": 0.7253,
+        "brier": 0.3992,
+        "correct": true
+      },
+      "market": {
+        "p_home": 0.4607,
+        "p_draw": 0.2789,
+        "p_away": 0.2604,
+        "log_loss": 0.7749,
+        "brier": 0.4364,
+        "correct": true
+      },
+      "prediction_file": "2026-27/gw11.csv",
+      "rescheduled": false,
+      "made_before_kickoff": true,
+      "counted": true,
+      "running": {
+        "n": 3,
+        "model": {
+          "log_loss": 1.206,
+          "brier": 0.7757,
+          "accuracy": 0.3333
+        },
+        "market": {
+          "log_loss": 1.3077,
+          "brier": 0.8451,
+          "accuracy": 0.3333
+        }
+      }
+    },
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "match_id": "26-27-prem-chelsea-vs-leeds-united",
+      "kickoff_utc": "2026-11-21T15:00:00Z",
+      "date_played": "2026-11-21",
+      "home_team": "Chelsea",
+      "away_team": "Leeds",
+      "home_goals": 1,
+      "away_goals": 4,
+      "result": "A",
+      "model": {
+        "p_home": 0.5008,
+        "p_draw": 0.2657,
+        "p_away": 0.2336,
+        "log_loss": 1.4543,
+        "brier": 0.9088,
+        "correct": false
+      },
+      "market": {
+        "p_home": 0.4837,
+        "p_draw": 0.262,
+        "p_away": 0.2543,
+        "log_loss": 1.3694,
+        "brier": 0.8588,
+        "correct": false
+      },
+      "prediction_file": "2026-27/gw11.csv",
+      "rescheduled": false,
+      "made_before_kickoff": true,
+      "counted": true,
+      "running": {
+        "n": 4,
+        "model": {
+          "log_loss": 1.268,
+          "brier": 0.809,
+          "accuracy": 0.25
+        },
+        "market": {
+          "log_loss": 1.3232,
+          "brier": 0.8485,
+          "accuracy": 0.25
+        }
+      }
+    },
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "match_id": "26-27-prem-coventry-city-vs-crystal-palace",
+      "kickoff_utc": "2026-11-21T15:00:00Z",
+      "date_played": "2026-11-21",
+      "home_team": "Coventry",
+      "away_team": "Crystal Palace",
+      "home_goals": 3,
+      "away_goals": 2,
+      "result": "H",
+      "model": {
+        "p_home": 0.3815,
+        "p_draw": 0.281,
+        "p_away": 0.3375,
+        "log_loss": 0.9635,
+        "brier": 0.5753,
+        "correct": true
+      },
+      "market": {
+        "p_home": 0.382,
+        "p_draw": 0.2711,
+        "p_away": 0.3469,
+        "log_loss": 0.9624,
+        "brier": 0.5758,
+        "correct": true
+      },
+      "prediction_file": "2026-27/gw11.csv",
+      "rescheduled": false,
+      "made_before_kickoff": true,
+      "counted": true,
+      "running": {
+        "n": 5,
+        "model": {
+          "log_loss": 1.2071,
+          "brier": 0.7623,
+          "accuracy": 0.4
+        },
+        "market": {
+          "log_loss": 1.251,
+          "brier": 0.794,
+          "accuracy": 0.4
+        }
+      }
+    },
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "match_id": "26-27-prem-tottenham-hotspur-vs-ipswich-town",
+      "kickoff_utc": "2026-11-21T15:00:00Z",
+      "date_played": "2026-11-21",
+      "home_team": "Tottenham",
+      "away_team": "Ipswich",
+      "home_goals": 2,
+      "away_goals": 0,
+      "result": "H",
+      "model": {
+        "p_home": 0.6064,
+        "p_draw": 0.2152,
+        "p_away": 0.1783,
+        "log_loss": 0.5001,
+        "brier": 0.233,
+        "correct": true
+      },
+      "market": {
+        "p_home": 0.6411,
+        "p_draw": 0.2018,
+        "p_away": 0.1571,
+        "log_loss": 0.4445,
+        "brier": 0.1942,
+        "correct": true
+      },
+      "prediction_file": "2026-27/gw11.csv",
+      "rescheduled": false,
+      "made_before_kickoff": true,
+      "counted": true,
+      "running": {
+        "n": 6,
+        "model": {
+          "log_loss": 1.0893,
+          "brier": 0.6741,
+          "accuracy": 0.5
+        },
+        "market": {
+          "log_loss": 1.1166,
+          "brier": 0.694,
+          "accuracy": 0.5
+        }
+      }
+    },
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "match_id": "26-27-prem-newcastle-united-vs-arsenal",
+      "kickoff_utc": "2026-11-21T17:30:00Z",
+      "date_played": "2026-11-21",
+      "home_team": "Newcastle",
+      "away_team": "Arsenal",
+      "home_goals": 2,
+      "away_goals": 2,
+      "result": "D",
+      "model": {
+        "p_home": 0.2181,
+        "p_draw": 0.24,
+        "p_away": 0.5419,
+        "log_loss": 1.4271,
+        "brier": 0.9188,
+        "correct": false
+      },
+      "market": {
+        "p_home": 0.1576,
+        "p_draw": 0.216,
+        "p_away": 0.6264,
+        "log_loss": 1.5327,
+        "brier": 1.032,
+        "correct": false
+      },
+      "prediction_file": "2026-27/gw11.csv",
+      "rescheduled": false,
+      "made_before_kickoff": true,
+      "counted": true,
+      "running": {
+        "n": 7,
+        "model": {
+          "log_loss": 1.1376,
+          "brier": 0.709,
+          "accuracy": 0.4286
+        },
+        "market": {
+          "log_loss": 1.176,
+          "brier": 0.7423,
+          "accuracy": 0.4286
+        }
+      }
+    },
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "match_id": "26-27-prem-hull-city-vs-brighton-hove-albion",
+      "kickoff_utc": "2026-11-22T14:00:00Z",
+      "date_played": "2026-11-22",
+      "home_team": "Hull",
+      "away_team": "Brighton",
+      "home_goals": 2,
+      "away_goals": 0,
+      "result": "H",
+      "model": {
+        "p_home": 0.2253,
+        "p_draw": 0.2783,
+        "p_away": 0.4964,
+        "log_loss": 1.4904,
+        "brier": 0.9241,
+        "correct": false
+      },
+      "market": {
+        "p_home": 0.1498,
+        "p_draw": 0.2115,
+        "p_away": 0.6387,
+        "log_loss": 1.8984,
+        "brier": 1.1755,
+        "correct": false
+      },
+      "prediction_file": "2026-27/gw11.csv",
+      "rescheduled": false,
+      "made_before_kickoff": true,
+      "counted": true,
+      "running": {
+        "n": 8,
+        "model": {
+          "log_loss": 1.1817,
+          "brier": 0.7359,
+          "accuracy": 0.375
+        },
+        "market": {
+          "log_loss": 1.2663,
+          "brier": 0.7964,
+          "accuracy": 0.375
+        }
+      }
+    },
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "match_id": "26-27-prem-liverpool-vs-manchester-united",
+      "kickoff_utc": "2026-11-22T16:30:00Z",
+      "date_played": "2026-11-22",
+      "home_team": "Liverpool",
+      "away_team": "Man United",
+      "home_goals": 4,
+      "away_goals": 0,
+      "result": "H",
+      "model": {
+        "p_home": 0.5433,
+        "p_draw": 0.2167,
+        "p_away": 0.24,
+        "log_loss": 0.61,
+        "brier": 0.3131,
+        "correct": true
+      },
+      "market": {
+        "p_home": 0.5359,
+        "p_draw": 0.2289,
+        "p_away": 0.2352,
+        "log_loss": 0.6238,
+        "brier": 0.3231,
+        "correct": true
+      },
+      "prediction_file": "2026-27/gw11.csv",
+      "rescheduled": false,
+      "made_before_kickoff": true,
+      "counted": true,
+      "running": {
+        "n": 9,
+        "model": {
+          "log_loss": 1.1182,
+          "brier": 0.6889,
+          "accuracy": 0.4444
+        },
+        "market": {
+          "log_loss": 1.1949,
+          "brier": 0.7439,
+          "accuracy": 0.4444
+        }
+      }
+    }
+  ]
 }

@@ -1497,8 +1497,21 @@
         }
       ]
     },
-    "live": null
+    "live": {
+      "n": 9,
+      "n_excluded": 0,
+      "model": {
+        "log_loss": 1.1182,
+        "brier": 0.6889,
+        "accuracy": 0.4444
+      },
+      "market": {
+        "log_loss": 1.1949,
+        "brier": 0.7439,
+        "accuracy": 0.4444
+      }
+    }
   },
-  "data_through": "2026-11-08",
-  "last_updated": "2026-11-19T14:49:58Z"
+  "data_through": "2026-11-22",
+  "last_updated": "2026-11-23T17:06:58Z"
 }

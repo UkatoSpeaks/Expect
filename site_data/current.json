@@ -18,10 +18,10 @@
       "elo_gap": 231.1,
       "dc_exp_goals_home": 2.09,
       "dc_exp_goals_away": 0.85,
-      "status": "upcoming",
-      "home_goals": null,
-      "away_goals": null,
-      "result": null
+      "status": "finished",
+      "home_goals": 1,
+      "away_goals": 1,
+      "result": "D"
     },
     {
       "match_id": "26-27-prem-aston-villa-vs-sunderland",
@@ -37,10 +37,10 @@
       "elo_gap": 163.6,
       "dc_exp_goals_home": 1.66,
       "dc_exp_goals_away": 0.96,
-      "status": "upcoming",
-      "home_goals": null,
-      "away_goals": null,
-      "result": null
+      "status": "finished",
+      "home_goals": 0,
+      "away_goals": 0,
+      "result": "D"
     },
     {
       "match_id": "26-27-prem-afc-bournemouth-vs-nottingham-forest",
@@ -56,10 +56,10 @@
       "elo_gap": 94.1,
       "dc_exp_goals_home": 1.55,
       "dc_exp_goals_away": 1.13,
-      "status": "upcoming",
-      "home_goals": null,
-      "away_goals": null,
-      "result": null
+      "status": "finished",
+      "home_goals": 2,
+      "away_goals": 0,
+      "result": "H"
     },
     {
       "match_id": "26-27-prem-chelsea-vs-leeds-united",
@@ -75,10 +75,10 @@
       "elo_gap": 68.9,
       "dc_exp_goals_home": 1.66,
       "dc_exp_goals_away": 1.12,
-      "status": "upcoming",
-      "home_goals": null,
-      "away_goals": null,
-      "result": null
+      "status": "finished",
+      "home_goals": 1,
+      "away_goals": 4,
+      "result": "A"
     },
     {
       "match_id": "26-27-prem-coventry-city-vs-crystal-palace",
@@ -94,10 +94,10 @@
       "elo_gap": -69.9,
       "dc_exp_goals_home": 1.33,
       "dc_exp_goals_away": 1.42,
-      "status": "upcoming",
-      "home_goals": null,
-      "away_goals": null,
-      "result": null
+      "status": "finished",
+      "home_goals": 3,
+      "away_goals": 2,
+      "result": "H"
     },
     {
       "match_id": "26-27-prem-tottenham-hotspur-vs-ipswich-town",
@@ -113,10 +113,10 @@
       "elo_gap": 84.8,
       "dc_exp_goals_home": 2.2,
       "dc_exp_goals_away": 1.16,
-      "status": "upcoming",
-      "home_goals": null,
-      "away_goals": null,
-      "result": null
+      "status": "finished",
+      "home_goals": 2,
+      "away_goals": 0,
+      "result": "H"
     },
     {
       "match_id": "26-27-prem-newcastle-united-vs-arsenal",
@@ -132,10 +132,10 @@
       "elo_gap": -272.9,
       "dc_exp_goals_home": 0.97,
       "dc_exp_goals_away": 1.67,
-      "status": "upcoming",
-      "home_goals": null,
-      "away_goals": null,
-      "result": null
+      "status": "finished",
+      "home_goals": 2,
+      "away_goals": 2,
+      "result": "D"
     },
     {
       "match_id": "26-27-prem-hull-city-vs-brighton-hove-albion",
@@ -151,10 +151,10 @@
       "elo_gap": -232.1,
       "dc_exp_goals_home": 1.02,
       "dc_exp_goals_away": 1.35,
-      "status": "upcoming",
-      "home_goals": null,
-      "away_goals": null,
-      "result": null
+      "status": "finished",
+      "home_goals": 2,
+      "away_goals": 0,
+      "result": "H"
     },
     {
       "match_id": "26-27-prem-liverpool-vs-manchester-united",
@@ -170,10 +170,10 @@
       "elo_gap": 95.3,
       "dc_exp_goals_home": 2.03,
       "dc_exp_goals_away": 1.21,
-      "status": "upcoming",
-      "home_goals": null,
-      "away_goals": null,
-      "result": null
+      "status": "finished",
+      "home_goals": 4,
+      "away_goals": 0,
+      "result": "H"
     },
     {
       "match_id": "26-27-prem-brentford-vs-everton",
