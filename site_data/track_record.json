@@ -1,33 +1,33 @@
 {
   "counted_rule": "predicted before kick-off and closing market odds available",
   "totals": {
-    "n": 9,
+    "n": 10,
     "n_excluded": 0,
     "model": {
-      "log_loss": 1.1182,
-      "brier": 0.6889,
-      "accuracy": 0.4444
+      "log_loss": 1.084,
+      "brier": 0.6638,
+      "accuracy": 0.5
     },
     "market": {
-      "log_loss": 1.1949,
-      "brier": 0.7439,
-      "accuracy": 0.4444
+      "log_loss": 1.1556,
+      "brier": 0.715,
+      "accuracy": 0.5
     }
   },
   "by_gameweek": [
     {
       "season": "2026/27",
       "gameweek": 11,
-      "n": 9,
+      "n": 10,
       "model": {
-        "log_loss": 1.1182,
-        "brier": 0.6889,
-        "accuracy": 0.4444
+        "log_loss": 1.084,
+        "brier": 0.6638,
+        "accuracy": 0.5
       },
       "market": {
-        "log_loss": 1.1949,
-        "brier": 0.7439,
-        "accuracy": 0.4444
+        "log_loss": 1.1556,
+        "brier": 0.715,
+        "accuracy": 0.5
       }
     }
   ],
@@ -434,6 +434,51 @@
           "log_loss": 1.1949,
           "brier": 0.7439,
           "accuracy": 0.4444
+        }
+      }
+    },
+    {
+      "season": "2026/27",
+      "gameweek": 11,
+      "match_id": "26-27-prem-brentford-vs-everton",
+      "kickoff_utc": "2026-11-23T20:00:00Z",
+      "date_played": "2026-11-23",
+      "home_team": "Brentford",
+      "away_team": "Everton",
+      "home_goals": 4,
+      "away_goals": 0,
+      "result": "H",
+      "model": {
+        "p_home": 0.46,
+        "p_draw": 0.2616,
+        "p_away": 0.2784,
+        "log_loss": 0.7766,
+        "brier": 0.4376,
+        "correct": true
+      },
+      "market": {
+        "p_home": 0.4488,
+        "p_draw": 0.2748,
+        "p_away": 0.2764,
+        "log_loss": 0.8011,
+        "brier": 0.4557,
+        "correct": true
+      },
+      "prediction_file": "2026-27/gw11.csv",
+      "rescheduled": false,
+      "made_before_kickoff": true,
+      "counted": true,
+      "running": {
+        "n": 10,
+        "model": {
+          "log_loss": 1.084,
+          "brier": 0.6638,
+          "accuracy": 0.5
+        },
+        "market": {
+          "log_loss": 1.1556,
+          "brier": 0.715,
+          "accuracy": 0.5
         }
       }
     }
